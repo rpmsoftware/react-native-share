@@ -20,6 +20,12 @@ public class GenericShare extends ShareIntent {
         this.openIntentChooser();
     }
 
+    public void view(ReadableMap options) throws ActivityNotFoundException {
+        super.view(options);
+        //  extra params here
+        this.openIntentChooser();
+    }
+
     @Override
     protected String getPackage() {
         return null;

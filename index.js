@@ -56,6 +56,31 @@ class RNShare {
       }
     });
   }
+  static view(options) {
+    return new Promise((resolve, reject) => {
+      if (Platform.OS === "ios") {
+        ActionSheetIOS.showShareActionSheetWithOptions(options, (error) => {
+          return reject({ error: error });
+        }, (success, activityType) => {
+          if(success) {
+            return resolve({
+              app: activityType
+            });
+          } else {
+            reject({ error: "User did not share" });
+          }
+        });
+      } else {
+        NativeModules.RNShare.view(options,(e) => {
+          return reject({ error: e });
+        },(e) => {
+          resolve({
+            message: e
+          });
+        });
+      }
+    });
+  }
   static shareSingle(options){
     if (Platform.OS === "ios" || Platform.OS === "android") {
       return new Promise((resolve, reject) => {

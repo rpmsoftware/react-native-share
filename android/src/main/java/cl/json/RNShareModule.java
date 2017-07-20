@@ -71,4 +71,17 @@ public class RNShareModule extends ReactContextBaseJavaModule {
             failureCallback.invoke("no exists social key");
         }
     }
+    @ReactMethod
+    public void view(ReadableMap options, @Nullable Callback failureCallback, @Nullable Callback successCallback) {
+        System.out.println("SHARE FOR VIEWING");
+        try {
+          GenericShare share = new GenericShare(this.reactContext);
+          share.view(options);
+          successCallback.invoke("OK");
+        }catch(ActivityNotFoundException ex) {
+            System.out.println("ERROR");
+            System.out.println(ex.getMessage());
+            failureCallback.invoke("not_available");
+        }
+    }
 }

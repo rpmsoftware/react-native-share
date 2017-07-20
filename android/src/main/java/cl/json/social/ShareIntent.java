@@ -57,6 +57,20 @@ public abstract class ShareIntent {
             this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message"));
         }
     }
+    public void view(ReadableMap options) throws ActivityNotFoundException {
+      this.getIntent().setAction(android.content.Intent.ACTION_VIEW);
+      ShareFile fileShare = getFileShare(options);
+      if(fileShare.isFile()) {
+          Uri uriFile = fileShare.getURI();
+          this.getIntent().setDataAndType(uriFile, fileShare.getType());
+          if (ShareIntent.hasValidKey("message", options)) {
+            this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message"));
+          }
+          this.getIntent().addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      } else {
+          this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message") + " " + options.getString("url"));
+      }
+    }
     protected ShareFile getFileShare(ReadableMap options) {
         if (ShareIntent.hasValidKey("type", options)) {
             return new ShareFile(options.getString("url"), options.getString("type"), this.reactContext);
