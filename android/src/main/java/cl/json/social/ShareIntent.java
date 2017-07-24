@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -11,6 +12,7 @@ import com.facebook.react.bridge.ReadableMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import cl.json.ShareFile;
 
@@ -58,6 +60,7 @@ public abstract class ShareIntent {
         }
     }
     public void view(ReadableMap options) throws ActivityNotFoundException {
+      chooserTitle = "Open";
       this.getIntent().setAction(android.content.Intent.ACTION_VIEW);
       ShareFile fileShare = getFileShare(options);
       if(fileShare.isFile()) {
@@ -67,6 +70,19 @@ public abstract class ShareIntent {
             this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message"));
           }
           this.getIntent().addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+          PackageManager packageManager = this.reactContext.getPackageManager();
+          List<ResolveInfo> activities = packageManager.queryIntentActivities(this.getIntent(), 0);
+          boolean isIntentSafe = activities.size() > 0;
+          if (isIntentSafe && activities.size() == 1) {
+            String activityName = activities.get(0).loadLabel(packageManager).toString();
+            isIntentSafe = activityName != "Text Editor";
+          }
+
+
+          if (!isIntentSafe) {
+            throw new ActivityNotFoundException();
+          }
       } else {
           this.getIntent().putExtra(Intent.EXTRA_TEXT, options.getString("message") + " " + options.getString("url"));
       }
